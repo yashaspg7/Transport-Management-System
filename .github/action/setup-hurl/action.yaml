@@ -1,0 +1,10 @@
+name: 'Setup Hurl'
+description: 'Installs the Hurl CLI tool'
+runs:
+  using: "composite"
+  steps:
+    - name: Install Hurl
+      uses: gacts/install-hurl@v1
+      with:
+        # version: '4.2.0'
+        disable-cache: false
