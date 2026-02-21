@@ -36,6 +36,28 @@ jobs:
   pytest:
     runs-on: ubuntu-latest
     needs: [lock_file]
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: testdb
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      ENVIRONMENT: test
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/testdb
+      TEST_DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/testdb
+      SECRET_KEY: test-secret-key-not-used-in-ci
+
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
@@ -45,10 +67,34 @@ jobs:
   hurl_tests:
     runs-on: ubuntu-latest
     needs: [pytest]
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: tmsdb
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      ENVIRONMENT: test
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/tmsdb
+      SECRET_KEY: test-secret-key-not-used-in-ci
+
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
       - uses: ./.github/actions/setup-hurl
+
+      - name: Run Alembic Migrations
+        run: uv run alembic upgrade head
 
       - name: Start FastAPI Server in Background
         run: uv run uvicorn src.main:app --host 0.0.0.0 --port 8000 &
@@ -57,7 +103,7 @@ jobs:
         run: |
           for i in $(seq 1 15); do
             curl -sf http://localhost:8000/health && break
-            echo "Waiting for server... ($i)"
+            echo "Waiting for server... ($i/15)"
             sleep 2
           done
 
@@ -65,7 +111,7 @@ jobs:
         run: hurl --test --glob "tests/hurl/*.hurl" --variable host=http://localhost:8000
 
   build:
-    runs-on: [ubuntu-latest]
+    runs-on: ubuntu-latest
     needs: [linting, formatting, type_consistency, hurl_tests]
     steps:
       - uses: actions/checkout@v4
