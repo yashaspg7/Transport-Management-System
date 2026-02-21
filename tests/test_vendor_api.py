@@ -38,7 +38,7 @@ async def test_create_and_get_vendor_flow(client: AsyncClient):
     # 5. Verify Deletion
     final_get_response = await client.get(f"/api/v1/vendors/{vendor_id}")
     assert final_get_response.status_code == 200
-    assert final_get_response.json()["is_active"] == False
+    assert not final_get_response.json()["is_active"]
 
 
 async def test_create_vendor_conflict(client: AsyncClient):

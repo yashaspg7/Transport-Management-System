@@ -6,7 +6,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.repositories.vendor import VendorRepository
 from src.schemas.vendor import VendorCreate
 from src.services.vendor_service import (
-    EmailAlreadyExists,
     VendorNotFound,
     VendorService,
 )
