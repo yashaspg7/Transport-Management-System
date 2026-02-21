@@ -11,7 +11,7 @@ from rich.text import Text
 
 # --- Configuration ---
 CI_COMMANDS = [
-    # {"cmd": "uv run ruff check . --fix", "desc": "Linting code with Ruff"},
+    {"cmd": "uv run ruff check . --fix", "desc": "Linting code with Ruff"},
     {"cmd": "uv run ruff check --select I --fix", "desc": "Organizing imports"},
     {"cmd": "uv run ruff format .", "desc": "Formatting code with Ruff"},
     {"cmd": "uv run pytest", "desc": "Running tests with Pytest"},
