@@ -1,0 +1,16 @@
+name: 'Setup UV'
+description: 'Installs the UV package manager and syncs dependencies'
+runs:
+  using: composite
+  steps:
+    - name: Install UV
+      shell: bash
+      run: curl -LsSf https://astral.sh/uv/install.sh | sh
+
+    - name: Add UV to PATH
+      shell: bash
+      run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+    - name: Sync dependencies
+      shell: bash
+      run: uv sync
