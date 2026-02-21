@@ -55,9 +55,12 @@ async def db_session() -> AsyncGenerator[AsyncSession, None]:
     undoing any changes.[3, 4]
     """
     async_engine = create_async_engine(TEST_DATABASE_URL)
-    async_session_factory = async_sessionmaker(async_engine, expire_on_commit=False)
-    async with async_session_factory() as session:
-        yield session
+    async with async_engine.connect() as conn:
+        await conn.begin()
+        async_session_factory = async_sessionmaker(conn, expire_on_commit=False)
+        async with async_session_factory() as session:
+            yield session
+        await conn.rollback()
     await async_engine.dispose()
 
 
