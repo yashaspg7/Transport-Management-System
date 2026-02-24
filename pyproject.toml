@@ -11,7 +11,9 @@ dependencies = [
     "fastapi[standard]>=0.116.1",
     "greenlet>=3.2.4",
     "gunicorn>=25.1.0",
+    "pwdlib[argon2]>=0.3.0",
     "pydantic-settings>=2.10.1",
+    "pyright[nodejs]>=1.1.403",
     "sqlmodel>=0.0.24",
 ]
 
