@@ -1,31 +1,32 @@
 from datetime import datetime
 from typing import Optional
-from uuid import UUID, uuid4
+from uuid import UUID
+
+from pydantic import BaseModel, ConfigDict, EmailStr
 from sqlmodel import Field
-from pydantic import EmailStr, BaseModel, ConfigDict
+
 from src.utils.sanitizers import SanitizationMixin
-from pydantic import BaseModel
 
 
 class UserBase(BaseModel, SanitizationMixin):
-    id: Optional[UUID] = Field(default_factory=uuid4, primary_key=True)
-    name: str = Field(index=True, unique=True)
-    username: str = Field(index=True, unique=True)
-    email: EmailStr = Field(index=True, unique=True)
-    hashed_password: str 
+    name: str = Field()
+    username: str = Field()
+    email: EmailStr = Field()
+    hashed_password: str
 
-class UserCreate(UserBase, SanitizationMixin):
+
+class UserCreate(UserBase):
     pass
 
-class UserUpdate(BaseModel, SanitizationMixin):
-    id: Optional[UUID] = Field(default_factory=uuid4, primary_key=True)
-    name: Optional[str] = Field(index=True, unique=True)
-    username: Optional[str] = Field(index=True, unique=True)
-    email: Optional[EmailStr] = Field(index=True, unique=True)
 
-class UserRead(UserBase, SanitizationMixin):
+class UserUpdate(BaseModel, SanitizationMixin):
+    name: Optional[str] = Field()
+    username: Optional[str] = Field()
+    email: Optional[EmailStr] = Field()
+
+
+class UserRead(UserBase):
     id: UUID
-    created_at : datetime
-    updated_at : datetime
+    created_at: datetime
+    updated_at: datetime
     model_config = ConfigDict(from_attributes=True)
-    
