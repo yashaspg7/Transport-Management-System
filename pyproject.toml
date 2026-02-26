@@ -13,7 +13,9 @@ dependencies = [
     "gunicorn>=25.1.0",
     "pwdlib[argon2]>=0.3.0",
     "pydantic-settings>=2.10.1",
+    "pyjwt>=2.11.0",
     "pyright[nodejs]>=1.1.403",
+    "python-multipart>=0.0.22",
     "sqlmodel>=0.0.24",
 ]
 
