@@ -12,11 +12,10 @@ class UserBase(BaseModel, SanitizationMixin):
     name: str = Field()
     username: str = Field()
     email: EmailStr = Field()
-    hashed_password: str
 
 
 class UserCreate(UserBase):
-    pass
+    password: str
 
 
 class UserUpdate(BaseModel, SanitizationMixin):
