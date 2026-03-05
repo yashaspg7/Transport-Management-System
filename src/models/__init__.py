@@ -6,17 +6,22 @@ Models define the database schema and are used for both database operations and 
 
 Available Models:
 - Vendor: Transport service providers and logistics partners
+- Vehicle: Information about vehicles used for transportation
 
 Usage:
     from src.models import Vendor
+    from src.models import Vehicle
     from src.models.vendor import Vendor  # Direct import also works
+
 """
 
+from .vehicle import Vehicle
 from .vendor import Vendor
 
 # Export all models for easy importing
 __all__ = [
     "Vendor",
+    "Vehicle",
     # Add future models here as they are created:
     # "Customer",
     # "Order",
@@ -29,6 +34,7 @@ __all__ = [
 # Model registry for easy access to all models
 MODELS = {
     "vendor": Vendor,
+    "vehicle": Vehicle,
     # Add future models here:
     # "customer": Customer,
     # "order": Order,
