@@ -64,6 +64,7 @@ def load_models():
         print("Loading SQLModel models...")
 
         # Import all models to register them with SQLModel metadata
+        from src.models.vehicle import Vehicle
         from src.models.vendor import Vendor
 
         # Add future model imports here as you create them:
@@ -71,7 +72,7 @@ def load_models():
         # from src.models.order import Order
         # from src.models.vehicle import Vehicle
 
-        models = [Vendor]  # Add future models to this list
+        models = [Vendor, Vehicle]  # Add future models to this list
         print(f"Loaded {len(models)} models: {[model.__name__ for model in models]}")
 
     except ImportError as e:
