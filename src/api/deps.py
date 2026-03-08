@@ -11,11 +11,14 @@ from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.db import get_db_session
+from src.repositories.user import UserRepository
 from src.repositories.vendor import VendorRepository
+from src.services.user_services import UserService
 from src.services.vendor_service import VendorService
 
 # Create a single, reusable instance of the repository
 vendor_repo = VendorRepository()
+user_repo = UserRepository()
 
 
 def get_vendor_service() -> VendorService:
@@ -23,9 +26,15 @@ def get_vendor_service() -> VendorService:
     return VendorService(vendor_repo)
 
 
+def get_user_service() -> UserService:
+    """Dependency to provide the UserService instance."""
+    return UserService(user_repo)
+
+
 # Type hint for dependencies for cleaner endpoint signatures
 DBSession = Annotated[AsyncSession, Depends(get_db_session)]
 VendorServiceDep = Annotated[VendorService, Depends(get_vendor_service)]
+UserServiceDep = Annotated[UserService, Depends(get_user_service)]
 
 # Add more service dependencies here as you create new services
 # Example:

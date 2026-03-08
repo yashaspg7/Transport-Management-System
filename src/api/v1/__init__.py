@@ -1,10 +1,12 @@
 from fastapi import APIRouter
 from fastapi.responses import RedirectResponse
 
+from .user import router as user_router
 from .vendor import router as vendor_router
 
 api_router = APIRouter()
 api_router.include_router(vendor_router, tags=["Vendors"])
+api_router.include_router(user_router, tags=["Users"])
 
 
 # Add redirects for API documentation
