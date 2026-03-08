@@ -10,6 +10,7 @@ from src.core.db import get_naive_utc_now
 
 
 class User(SQLModel, table=True):
+    __tablename__: str = "users"  # type: ignore[reportIncompatibleVariableOverride]
     id: Optional[UUID] = Field(default_factory=uuid4, primary_key=True)
     name: str = Field(index=True, unique=True)
     username: str = Field(index=True, unique=True)
