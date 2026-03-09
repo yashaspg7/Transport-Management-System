@@ -80,11 +80,11 @@ class VehicleService:
         self, session: AsyncSession, vendor_id: UUID, skip: int, limit: int
     ) -> List[Vehicle]:
         """Fetch vehicles for specific vendor, ensuring vendor exists first."""
-       
+
         vendor = await self.vendor_repo.get(session, vendor_id)
         if not vendor:
-            raise VendorNotFound(f"Vendor with ID {vendor_id} not found.")  
-        
+            raise VendorNotFound(f"Vendor with ID {vendor_id} not found.")
+
         return await self.repo.find_by_vendor_id(
             session, vendor_id=vendor_id, skip=skip, limit=limit
         )

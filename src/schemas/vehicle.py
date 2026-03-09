@@ -1,11 +1,12 @@
-from enum import Enum
 from datetime import datetime
+from enum import Enum
 from typing import Optional
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
 from src.utils.sanitizers import SanitizationMixin
+
 
 class VehicleStatus(str, Enum):
     IDLE = "Idle"
@@ -28,7 +29,6 @@ class VehicleCreate(VehicleBase, SanitizationMixin):
     pass
 
 
-
 class VehicleUpdate(BaseModel, SanitizationMixin):
     vendor_id: Optional[UUID] = None
     registration_number: Optional[str] = Field(
@@ -37,8 +37,9 @@ class VehicleUpdate(BaseModel, SanitizationMixin):
     make: Optional[str] = Field(default=None, min_length=1, max_length=100)
     model: Optional[str] = Field(default=None, min_length=1, max_length=100)
     capacity: Optional[float] = Field(default=None, ge=0.0)
-    status: Optional[VehicleStatus] = None 
+    status: Optional[VehicleStatus] = None
     is_active: Optional[bool] = None
+
 
 class VehicleRead(VehicleBase):
     id: UUID

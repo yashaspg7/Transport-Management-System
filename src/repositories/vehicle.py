@@ -16,26 +16,18 @@ class VehicleRepository:
 
     async def get(self, session: AsyncSession, obj_id: UUID) -> Optional[Vehicle]:
         """Get a single active vehicle by ID."""
-        query = select(Vehicle).where(
-            Vehicle.id == obj_id, 
-            Vehicle.is_active == True
-        )
+        query = select(Vehicle).where(Vehicle.id == obj_id, Vehicle.is_active)
         result = await session.execute(query)
         return result.scalars().first()
-    
+
     async def get_multi(
         self, session: AsyncSession, *, skip: int = 0, limit: int = 100
     ) -> List[Vehicle]:
         """Get multiple active vehicles with pagination."""
-        query = (
-            select(Vehicle)
-            .where(Vehicle.is_active == True)
-            .offset(skip)
-            .limit(limit)
-        )
+        query = select(Vehicle).where(Vehicle.is_active).offset(skip).limit(limit)
         result = await session.execute(query)
         return list(result.scalars().all())
-    
+
     async def create(self, session: AsyncSession, *, obj_in: VehicleCreate) -> Vehicle:
         """Create a new vehicle."""
         db_obj = Vehicle.model_validate(obj_in)
@@ -43,7 +35,7 @@ class VehicleRepository:
         await session.flush()
         await session.refresh(db_obj)
         return db_obj
-    
+
     async def update(
         self, session: AsyncSession, *, db_obj: Vehicle, obj_in: VehicleUpdate
     ) -> Vehicle:
@@ -55,7 +47,7 @@ class VehicleRepository:
         await session.flush()
         await session.refresh(db_obj)
         return db_obj
-   
+
     async def delete(self, session: AsyncSession, *, db_obj: Vehicle) -> None:
         """Delete a vehicle permanently."""
         await session.delete(db_obj)
@@ -65,8 +57,8 @@ class VehicleRepository:
         self, session: AsyncSession, *, registration_number: str
     ) -> Optional[Vehicle]:
         """
-        Find a vehicle by its unique registration number. 
-        Note: This intentionally includes inactive vehicles to prevent duplicate registrations 
+        Find a vehicle by its unique registration number.
+        Note: This intentionally includes inactive vehicles to prevent duplicate registrations
         of soft-deleted plates.
         """
         query = select(Vehicle).where(
@@ -81,10 +73,7 @@ class VehicleRepository:
         """Find all active vehicles belonging to a specific vendor."""
         query = (
             select(Vehicle)
-            .where(
-                Vehicle.vendor_id == vendor_id,
-                Vehicle.is_active == True
-            )
+            .where(Vehicle.vendor_id == vendor_id, Vehicle.is_active)
             .offset(skip)
             .limit(limit)
         )
@@ -99,13 +88,13 @@ class VehicleRepository:
         query = (
             select(Vehicle)
             .where(
-                    Vehicle.is_active == True,
+                Vehicle.is_active,
                 or_(
                     col(Vehicle.registration_number).ilike(search_pattern),
                     col(Vehicle.make).ilike(search_pattern),
                     col(Vehicle.model).ilike(search_pattern),
                     col(Vehicle.status).ilike(search_pattern),
-                )
+                ),
             )
             .offset(skip)
             .limit(limit)
