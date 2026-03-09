@@ -21,7 +21,7 @@ class VehicleBase(BaseModel, SanitizationMixin):
     make: str = Field(min_length=1, max_length=100)
     model: str = Field(min_length=1, max_length=100)
     capacity: float = Field(default=0.0, ge=0.0)
-    status: str = Field(default="Active", max_length=50)
+    status: VehicleStatus = Field(default=VehicleStatus.IDLE)
     is_active: bool = True
 
 
