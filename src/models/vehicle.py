@@ -21,8 +21,8 @@ class Vehicle(SQLModel, table=True):
     model: str = Field(max_length=100)
     capacity: float = Field(default=0.0, description="Payload capacity in kg/tons")
     status: str = Field(
-        default="Active", max_length=50
-    )  # e.g., Active, Maintenance, Out of Service
+        default="Idle", max_length=50
+    )  # e.g., Idle, In Transit, Maintenance, Out of Service
 
     is_active: bool = Field(default=True)
     created_at: datetime = Field(default_factory=get_naive_utc_now, nullable=False)
