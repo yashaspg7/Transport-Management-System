@@ -4,6 +4,7 @@ from typing import AsyncGenerator
 
 import pytest
 import pytest_asyncio
+from dotenv import load_dotenv
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
@@ -15,9 +16,14 @@ from src.core.db import get_db_session
 from src.main import app
 from src.models.vendor import SQLModel
 
-TEST_DATABASE_URL = os.getenv(
-    "TEST_DATABASE_URL", "postgresql+asyncpg://postgres:postgres@localhost:5432/testdb"
-)
+load_dotenv()
+
+_raw_url = os.getenv("TEST_DATABASE_URL")
+
+if not _raw_url:
+    _raw_url = "postgresql+asyncpg://postgres:postgres@localhost:5432/testdb"
+
+TEST_DATABASE_URL: str = _raw_url
 
 
 @pytest.fixture(scope="session")

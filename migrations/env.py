@@ -28,6 +28,15 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 
+def render_item(type_, obj, autogen_context):
+    """Custom type rendering for SQLModel's AutoString to prevent PyRight errors."""
+    if type_ == "type" and type(obj).__name__ == "AutoString":
+        if hasattr(obj, "length") and obj.length:
+            return f"sa.String(length={obj.length})"
+        return "sa.String()"
+    return False
+
+
 def get_database_url() -> str:
     """
     Get the async database URL from application settings.
@@ -64,6 +73,7 @@ def load_models():
         print("Loading SQLModel models...")
 
         # Import all models to register them with SQLModel metadata
+        from src.models.vehicle import Vehicle
         from src.models.vendor import Vendor
 
         # Add future model imports here as you create them:
@@ -71,7 +81,7 @@ def load_models():
         # from src.models.order import Order
         # from src.models.vehicle import Vehicle
 
-        models = [Vendor]  # Add future models to this list
+        models = [Vendor, Vehicle]  # Add future models to this list
         print(f"Loaded {len(models)} models: {[model.__name__ for model in models]}")
 
     except ImportError as e:
@@ -110,6 +120,7 @@ def run_migrations_offline() -> None:
         dialect_opts={"paramstyle": "named"},
         compare_type=True,
         compare_server_default=True,
+        render_item=render_item,
     )
 
     with context.begin_transaction():
@@ -129,7 +140,7 @@ def do_run_migrations(connection: Connection) -> None:
         compare_type=True,
         compare_server_default=True,
         # Additional options for better migration detection
-        render_item=None,
+        render_item=render_item,
         include_name=None,
         include_schemas=False,
     )
