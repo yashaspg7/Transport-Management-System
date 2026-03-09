@@ -36,7 +36,7 @@ Accept: application/json
   "make": "Volvo",
   "model": "FH16",
   "capacity": 20.0,
-  "status": "Active"
+  "status": "Idle"
 }
 
 HTTP 201

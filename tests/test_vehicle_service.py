@@ -3,7 +3,7 @@ from uuid import uuid4
 
 import pytest
 
-from src.schemas.vehicle import VehicleCreate, VehicleUpdate
+from src.schemas.vehicle import VehicleCreate, VehicleStatus, VehicleUpdate
 from src.services.vehicle_service import (
     RegistrationAlreadyExists,
     VehicleService,
@@ -40,7 +40,7 @@ def valid_vehicle_create(dummy_vendor_id):
         make="Tata",
         model="Prima",
         capacity=15.0,
-        status="Active",
+        status=VehicleStatus.IDLE,
     )
 
 
