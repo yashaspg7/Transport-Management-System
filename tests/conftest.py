@@ -1,6 +1,7 @@
 import asyncio
 import os
 from typing import AsyncGenerator
+from uuid import UUID
 
 import pytest
 import pytest_asyncio
@@ -11,8 +12,10 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 
+from src.api.deps import get_current_user
 from src.core.db import get_db_session
 from src.main import app
+from src.models.user import User
 from src.models.vendor import SQLModel
 
 TEST_DATABASE_URL = os.getenv(
@@ -68,19 +71,31 @@ async def db_session() -> AsyncGenerator[AsyncSession, None]:
 async def client(db_session: AsyncSession) -> AsyncGenerator[AsyncClient, None]:
     """
     Provides a configured httpx.AsyncClient for making API requests.
-    This fixture correctly overrides the application's database session
-    dependency to use the isolated, transactional test session.[5, 6]
+    Overrides BOTH the database session AND the authentication.
     """
 
+    # 1. Override the Database Session (Connect to Test DB)
     def override_get_db_session() -> AsyncSession:
-        """Dependency override to return the test session."""
         return db_session
 
     app.dependency_overrides[get_db_session] = override_get_db_session
 
+    # 2. Override the Authentication (Bypass Login)
+    # This creates a "Fake" logged-in user so tests don't need a token
+    mock_user = User(
+        id=UUID("00000000-0000-0000-0000-000000000000"),
+        email="test@example.com",
+        username="testuser",
+        hashed_password="fake",
+        name="Test User",
+        is_active=True,
+    )
+    app.dependency_overrides[get_current_user] = lambda: mock_user
+
+    # 3. Create the Client
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as async_client:
         yield async_client
 
-    # Clean up the dependency override after the test
-    del app.dependency_overrides[get_db_session]
+    # 4. Clean up overrides after the test
+    app.dependency_overrides.clear()
