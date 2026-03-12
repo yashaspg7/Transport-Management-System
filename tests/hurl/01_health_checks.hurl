@@ -2,6 +2,33 @@
 # Tests all health endpoints, API availability, and basic connectivity
 
 # ==============================================================================
+# Setup: Register and Login
+# ==============================================================================
+POST http://127.0.0.1:8000/api/v1/users/register
+Content-Type: application/json
+Accept: application/json
+
+{
+    "name": "Test User {{newUuid}}",
+    "username": "user_{{newUuid}}",
+    "email": "test-{{newUuid}}@example.com",
+    "password": "testpassword123"
+}
+
+HTTP 201
+[Captures]
+test_username: jsonpath "$.username"
+
+POST http://127.0.0.1:8000/api/v1/auth/login
+[FormParams]
+username: {{test_username}}
+password: testpassword123
+
+HTTP 200
+[Captures]
+access_token: jsonpath "$.access_token"
+
+# ==============================================================================
 # Test 1: Root Health Check Endpoint
 # ==============================================================================
 
@@ -92,6 +119,7 @@ duration < 5000
 # ==============================================================================
 
 GET http://127.0.0.1:8000/api/v1/vendors/
+Authorization: Bearer {{access_token}}
 Accept: application/json
 
 HTTP 200
@@ -105,6 +133,7 @@ duration < 2000
 # ==============================================================================
 
 GET http://127.0.0.1:8000/api/v1/vendors/count
+Authorization: Bearer {{access_token}}
 Accept: application/json
 
 HTTP 200
@@ -119,6 +148,7 @@ duration < 1000
 # ==============================================================================
 
 GET http://127.0.0.1:8000/api/v1/vendors/search/
+Authorization: Bearer {{access_token}}
 Accept: application/json
 [QueryStringParams]
 q: health-check-test
@@ -163,6 +193,7 @@ duration < 500
 # ==============================================================================
 
 GET http://127.0.0.1:8000/api/v1/vendors/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{access_token}}
 Accept: application/json
 
 HTTP 404
@@ -177,6 +208,7 @@ duration < 1000
 # ==============================================================================
 
 GET http://127.0.0.1:8000/api/v1/nonexistent-endpoint
+Authorization: Bearer {{access_token}}
 Accept: application/json
 
 HTTP 404
@@ -199,6 +231,7 @@ duration < 1000
 # ==============================================================================
 
 POST http://127.0.0.1:8000/api/v1/vendors/
+Authorization: Bearer {{access_token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -217,6 +250,7 @@ duration < 1000
 # ==============================================================================
 
 GET http://127.0.0.1:8000/api/v1/vendors/
+Authorization: Bearer {{access_token}}
 Accept: application/json
 [QueryStringParams]
 limit: 100
@@ -249,12 +283,14 @@ GET http://127.0.0.1:8000/health
 HTTP 200
 
 GET http://127.0.0.1:8000/api/v1/vendors/count
+Authorization: Bearer {{access_token}}
 HTTP 200
 
 GET http://127.0.0.1:8000/health
 HTTP 200
 
 GET http://127.0.0.1:8000/api/v1/vendors/count
+Authorization: Bearer {{access_token}}
 HTTP 200
 [Asserts]
 duration < 2000
@@ -264,6 +300,7 @@ duration < 2000
 # ==============================================================================
 
 GET http://127.0.0.1:8000/api/v1/vendors/
+Authorization: Bearer {{access_token}}
 Accept: application/json
 [QueryStringParams]
 limit: 1
