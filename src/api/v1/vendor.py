@@ -1,14 +1,16 @@
 from typing import List
 from uuid import UUID
 
-from fastapi import APIRouter, Query, status
+from fastapi import APIRouter, Depends, Query, status
 from pydantic import BaseModel
 
-from src.api.deps import DBSession, VendorServiceDep
+from src.api.deps import DBSession, VendorServiceDep, get_current_user
 from src.models.vendor import Vendor
 from src.schemas.vendor import VendorCreate, VendorRead, VendorUpdate
 
-router = APIRouter(prefix="/vendors", tags=["Vendors"])
+router = APIRouter(
+    prefix="/vendors", tags=["Vendors"], dependencies=[Depends(get_current_user)]
+)
 
 
 class VendorCountResponse(BaseModel):
