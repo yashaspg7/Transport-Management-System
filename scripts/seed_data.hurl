@@ -2,10 +2,38 @@
 # Creates sample vendor data for testing and development
 
 # ==============================================================================
+# Setup: Register and Login (Required to seed data)
+# ==============================================================================
+POST http://127.0.0.1:8000/api/v1/users/register
+Content-Type: application/json
+Accept: application/json
+
+{
+    "name": "Seeder Admin {{newUuid}}",
+    "username": "seeder_{{newUuid}}",
+    "email": "seeder-{{newUuid}}@example.com",
+    "password": "seedpassword123"
+}
+
+HTTP 201
+[Captures]
+seeder_username: jsonpath "$.username"
+
+POST http://127.0.0.1:8000/api/v1/auth/login
+[FormParams]
+username: {{seeder_username}}
+password: seedpassword123
+
+HTTP 200
+[Captures]
+access_token: jsonpath "$.access_token"
+
+# ==============================================================================
 # Seed Vendor 1: Swift Transport Solutions
 # ==============================================================================
 
 POST http://127.0.0.1:8000/api/v1/vendors/
+Authorization: Bearer {{access_token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -26,6 +54,7 @@ duration < 5000
 # ==============================================================================
 
 POST http://127.0.0.1:8000/api/v1/vendors/
+Authorization: Bearer {{access_token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -44,6 +73,7 @@ HTTP *
 # ==============================================================================
 
 POST http://127.0.0.1:8000/api/v1/vendors/
+Authorization: Bearer {{access_token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -62,6 +92,7 @@ HTTP *
 # ==============================================================================
 
 POST http://127.0.0.1:8000/api/v1/vendors/
+Authorization: Bearer {{access_token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -80,6 +111,7 @@ HTTP *
 # ==============================================================================
 
 POST http://127.0.0.1:8000/api/v1/vendors/
+Authorization: Bearer {{access_token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -98,6 +130,7 @@ HTTP *
 # ==============================================================================
 
 POST http://127.0.0.1:8000/api/v1/vendors/
+Authorization: Bearer {{access_token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -116,6 +149,7 @@ HTTP *
 # ==============================================================================
 
 POST http://127.0.0.1:8000/api/v1/vendors/
+Authorization: Bearer {{access_token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -134,6 +168,7 @@ HTTP *
 # ==============================================================================
 
 POST http://127.0.0.1:8000/api/v1/vendors/
+Authorization: Bearer {{access_token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -152,6 +187,7 @@ HTTP *
 # ==============================================================================
 
 POST http://127.0.0.1:8000/api/v1/vendors/
+Authorization: Bearer {{access_token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -170,6 +206,7 @@ HTTP *
 # ==============================================================================
 
 POST http://127.0.0.1:8000/api/v1/vendors/
+Authorization: Bearer {{access_token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -188,6 +225,7 @@ HTTP *
 # ==============================================================================
 
 POST http://127.0.0.1:8000/api/v1/vendors/
+Authorization: Bearer {{access_token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -206,6 +244,7 @@ HTTP *
 # ==============================================================================
 
 POST http://127.0.0.1:8000/api/v1/vendors/
+Authorization: Bearer {{access_token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -224,6 +263,7 @@ HTTP *
 # ==============================================================================
 
 POST http://127.0.0.1:8000/api/v1/vendors/
+Authorization: Bearer {{access_token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -242,6 +282,7 @@ HTTP *
 # ==============================================================================
 
 POST http://127.0.0.1:8000/api/v1/vendors/
+Authorization: Bearer {{access_token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -257,6 +298,7 @@ HTTP *
 # ==============================================================================
 
 POST http://127.0.0.1:8000/api/v1/vendors/
+Authorization: Bearer {{access_token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -275,6 +317,7 @@ HTTP *
 # ==============================================================================
 
 POST http://127.0.0.1:8000/api/v1/vendors/
+Authorization: Bearer {{access_token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -293,6 +336,7 @@ HTTP *
 # ==============================================================================
 
 POST http://127.0.0.1:8000/api/v1/vendors/
+Authorization: Bearer {{access_token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -311,6 +355,7 @@ HTTP *
 # ==============================================================================
 
 POST http://127.0.0.1:8000/api/v1/vendors/
+Authorization: Bearer {{access_token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -329,6 +374,7 @@ HTTP *
 # ==============================================================================
 
 POST http://127.0.0.1:8000/api/v1/vendors/
+Authorization: Bearer {{access_token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -347,6 +393,7 @@ HTTP *
 # ==============================================================================
 
 POST http://127.0.0.1:8000/api/v1/vendors/
+Authorization: Bearer {{access_token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -364,6 +411,7 @@ HTTP *
 # ==============================================================================
 
 GET http://127.0.0.1:8000/api/v1/vendors/count
+Authorization: Bearer {{access_token}}
 Accept: application/json
 
 HTTP 200
