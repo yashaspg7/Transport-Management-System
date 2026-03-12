@@ -47,3 +47,6 @@ class UserRepository:
     async def delete(self, session: AsyncSession, db_obj: User):
         await session.delete(db_obj)
         await session.flush()
+
+
+user_repo = UserRepository()
