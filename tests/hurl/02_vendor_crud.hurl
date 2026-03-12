@@ -2,10 +2,38 @@
 # Complete testing suite covering all vendor management endpoints and scenarios
 
 # ==============================================================================
+# Setup: Register and Login
+# ==============================================================================
+POST http://127.0.0.1:8000/api/v1/users/register
+Content-Type: application/json
+Accept: application/json
+
+{
+    "name": "Test User {{newUuid}}",
+    "username": "user_{{newUuid}}",
+    "email": "test-{{newUuid}}@example.com",
+    "password": "testpassword123"
+}
+
+HTTP 201
+[Captures]
+test_username: jsonpath "$.username"
+
+POST http://127.0.0.1:8000/api/v1/auth/login
+[FormParams]
+username: {{test_username}}
+password: testpassword123
+
+HTTP 200
+[Captures]
+access_token: jsonpath "$.access_token"
+
+# ==============================================================================
 # Test 1: Create a New Vendor - Basic Success Case
 # ==============================================================================
 
 POST http://127.0.0.1:8000/api/v1/vendors/
+Authorization: Bearer {{access_token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -39,6 +67,7 @@ created_at: jsonpath "$.created_at"
 # ==============================================================================
 
 POST http://127.0.0.1:8000/api/v1/vendors/
+Authorization: Bearer {{access_token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -66,6 +95,7 @@ minimal_vendor_id: jsonpath "$.id"
 # ==============================================================================
 
 GET http://127.0.0.1:8000/api/v1/vendors/{{vendor_id}}
+Authorization: Bearer {{access_token}}
 Accept: application/json
 
 HTTP 200
@@ -83,6 +113,7 @@ duration < 1000
 # ==============================================================================
 
 GET http://127.0.0.1:8000/api/v1/vendors/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{access_token}}
 Accept: application/json
 
 HTTP 404
@@ -97,6 +128,7 @@ duration < 1000
 # ==============================================================================
 
 GET http://127.0.0.1:8000/api/v1/vendors/
+Authorization: Bearer {{access_token}}
 Accept: application/json
 
 HTTP 200
@@ -114,6 +146,7 @@ duration < 2000
 # ==============================================================================
 
 GET http://127.0.0.1:8000/api/v1/vendors/
+Authorization: Bearer {{access_token}}
 Accept: application/json
 [QueryStringParams]
 skip: 0
@@ -131,6 +164,7 @@ duration < 1000
 # ==============================================================================
 
 GET http://127.0.0.1:8000/api/v1/vendors/
+Authorization: Bearer {{access_token}}
 Accept: application/json
 [QueryStringParams]
 active_only: true
@@ -147,6 +181,7 @@ duration < 2000
 # ==============================================================================
 
 GET http://127.0.0.1:8000/api/v1/vendors/count
+Authorization: Bearer {{access_token}}
 Accept: application/json
 
 HTTP 200
@@ -161,6 +196,7 @@ duration < 1000
 # ==============================================================================
 
 GET http://127.0.0.1:8000/api/v1/vendors/search/
+Authorization: Bearer {{access_token}}
 Accept: application/json
 [QueryStringParams]
 q: Test
@@ -178,6 +214,7 @@ duration < 1000
 # ==============================================================================
 
 GET http://127.0.0.1:8000/api/v1/vendors/search/
+Authorization: Bearer {{access_token}}
 Accept: application/json
 [QueryStringParams]
 q: NonExistentCompanyName12345
@@ -196,6 +233,7 @@ duration < 1000
 # ==============================================================================
 
 GET http://127.0.0.1:8000/api/v1/vendors/email/{{vendor_email}}
+Authorization: Bearer {{access_token}}
 Accept: application/json
 
 HTTP 200
@@ -210,6 +248,7 @@ duration < 1000
 # ==============================================================================
 
 GET http://127.0.0.1:8000/api/v1/vendors/email/nonexistent@example.com
+Authorization: Bearer {{access_token}}
 Accept: application/json
 
 HTTP 404
@@ -223,6 +262,7 @@ duration < 1000
 # ==============================================================================
 
 PUT http://127.0.0.1:8000/api/v1/vendors/{{vendor_id}}
+Authorization: Bearer {{access_token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -249,6 +289,7 @@ updated_at: jsonpath "$.updated_at"
 # ==============================================================================
 
 PUT http://127.0.0.1:8000/api/v1/vendors/{{minimal_vendor_id}}
+Authorization: Bearer {{access_token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -274,6 +315,7 @@ duration < 2000
 # ==============================================================================
 
 PUT http://127.0.0.1:8000/api/v1/vendors/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{access_token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -292,6 +334,7 @@ duration < 1000
 # ==============================================================================
 
 GET http://127.0.0.1:8000/api/v1/vendors/{{vendor_id}}
+Authorization: Bearer {{access_token}}
 Accept: application/json
 
 HTTP 200
@@ -306,6 +349,7 @@ duration < 1000
 # ==============================================================================
 
 POST http://127.0.0.1:8000/api/v1/vendors/
+Authorization: Bearer {{access_token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -328,6 +372,7 @@ duration < 2000
 # ==============================================================================
 
 POST http://127.0.0.1:8000/api/v1/vendors/
+Authorization: Bearer {{access_token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -348,6 +393,7 @@ duration < 2000
 # ==============================================================================
 
 POST http://127.0.0.1:8000/api/v1/vendors/
+Authorization: Bearer {{access_token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -367,6 +413,7 @@ duration < 2000
 # ==============================================================================
 
 POST http://127.0.0.1:8000/api/v1/vendors/
+Authorization: Bearer {{access_token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -385,6 +432,7 @@ duration < 2000
 # ==============================================================================
 
 POST http://127.0.0.1:8000/api/v1/vendors/
+Authorization: Bearer {{access_token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -398,6 +446,7 @@ HTTP 201
 temp_vendor_id: jsonpath "$.id"
 
 PUT http://127.0.0.1:8000/api/v1/vendors/{{temp_vendor_id}}
+Authorization: Bearer {{access_token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -416,6 +465,7 @@ duration < 2000
 # ==============================================================================
 
 DELETE http://127.0.0.1:8000/api/v1/vendors/{{temp_vendor_id}}
+Authorization: Bearer {{access_token}}
 
 HTTP 204
 [Asserts]
@@ -426,6 +476,7 @@ duration < 1000
 # ==============================================================================
 
 GET http://127.0.0.1:8000/api/v1/vendors/{{temp_vendor_id}}
+Authorization: Bearer {{access_token}}
 Accept: application/json
 
 HTTP 200
@@ -439,6 +490,7 @@ duration < 1000
 # ==============================================================================
 
 POST http://127.0.0.1:8000/api/v1/vendors/
+Authorization: Bearer {{access_token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -456,6 +508,7 @@ permanent_delete_id: jsonpath "$.id"
 # ==============================================================================
 
 DELETE http://127.0.0.1:8000/api/v1/vendors/{{permanent_delete_id}}
+Authorization: Bearer {{access_token}}
 [QueryStringParams]
 permanent: true
 
@@ -468,6 +521,7 @@ duration < 1000
 # ==============================================================================
 
 GET http://127.0.0.1:8000/api/v1/vendors/{{permanent_delete_id}}
+Authorization: Bearer {{access_token}}
 Accept: application/json
 
 HTTP 404
@@ -480,6 +534,7 @@ duration < 1000
 # ==============================================================================
 
 DELETE http://127.0.0.1:8000/api/v1/vendors/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{access_token}}
 
 HTTP 404
 [Asserts]
@@ -490,6 +545,7 @@ duration < 1000
 # ==============================================================================
 
 GET http://127.0.0.1:8000/api/v1/vendors/
+Authorization: Bearer {{access_token}}
 Accept: application/json
 [QueryStringParams]
 skip: -1
@@ -505,6 +561,7 @@ duration < 1000
 # ==============================================================================
 
 GET http://127.0.0.1:8000/api/v1/vendors/
+Authorization: Bearer {{access_token}}
 Accept: application/json
 [QueryStringParams]
 skip: 0
@@ -520,6 +577,7 @@ duration < 1000
 # ==============================================================================
 
 GET http://127.0.0.1:8000/api/v1/vendors/
+Authorization: Bearer {{access_token}}
 Accept: application/json
 [QueryStringParams]
 skip: 0
@@ -535,6 +593,7 @@ duration < 1000
 # ==============================================================================
 
 GET http://127.0.0.1:8000/api/v1/vendors/search/
+Authorization: Bearer {{access_token}}
 Accept: application/json
 [QueryStringParams]
 q:
@@ -553,6 +612,7 @@ body == "[]"
 # ==============================================================================
 
 POST http://127.0.0.1:8000/api/v1/vendors/
+Authorization: Bearer {{access_token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -569,6 +629,7 @@ duration < 3000
 perf_test_vendor_id_1: jsonpath "$.id"
 
 POST http://127.0.0.1:8000/api/v1/vendors/
+Authorization: Bearer {{access_token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -585,6 +646,7 @@ duration < 3000
 perf_test_vendor_id_2: jsonpath "$.id"
 
 POST http://127.0.0.1:8000/api/v1/vendors/
+Authorization: Bearer {{access_token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -605,6 +667,7 @@ perf_test_vendor_id_3: jsonpath "$.id"
 # ==============================================================================
 
 GET http://127.0.0.1:8000/api/v1/vendors/count
+Authorization: Bearer {{access_token}}
 Accept: application/json
 
 HTTP 200
@@ -619,6 +682,7 @@ duration < 1000
 # ==============================================================================
 
 GET http://127.0.0.1:8000/api/v1/vendors/search/
+Authorization: Bearer {{access_token}}
 Accept: application/json
 [QueryStringParams]
 q: Performance
@@ -636,6 +700,7 @@ duration < 2000
 # ==============================================================================
 
 POST http://127.0.0.1:8000/api/v1/vendors/
+Authorization: Bearer {{access_token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -657,42 +722,49 @@ long_name_vendor_id: jsonpath "$.id"
 # ==============================================================================
 
 DELETE http://127.0.0.1:8000/api/v1/vendors/{{vendor_id}}
+Authorization: Bearer {{access_token}}
 [QueryStringParams]
 permanent: true
 
 HTTP 204
 
 DELETE http://127.0.0.1:8000/api/v1/vendors/{{minimal_vendor_id}}
+Authorization: Bearer {{access_token}}
 [QueryStringParams]
 permanent: true
 
 HTTP 204
 
 DELETE http://127.0.0.1:8000/api/v1/vendors/{{long_name_vendor_id}}
+Authorization: Bearer {{access_token}}
 [QueryStringParams]
 permanent: true
 
 HTTP 204
 
 DELETE http://127.0.0.1:8000/api/v1/vendors/{{perf_test_vendor_id_1}}
+Authorization: Bearer {{access_token}}
 [QueryStringParams]
 permanent: true
 
 HTTP 204
 
 DELETE http://127.0.0.1:8000/api/v1/vendors/{{perf_test_vendor_id_2}}
+Authorization: Bearer {{access_token}}
 [QueryStringParams]
 permanent: true
 
 HTTP 204
 
 DELETE http://127.0.0.1:8000/api/v1/vendors/{{perf_test_vendor_id_3}}
+Authorization: Bearer {{access_token}}
 [QueryStringParams]
 permanent: true
 
 HTTP 204
 
 DELETE http://127.0.0.1:8000/api/v1/vendors/{{temp_vendor_id}}
+Authorization: Bearer {{access_token}}
 [QueryStringParams]
 permanent: true
 
