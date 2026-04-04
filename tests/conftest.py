@@ -12,8 +12,8 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 
-from src.api.deps import get_current_user
 from src.core.db import get_db_session
+from src.core.security import create_access_token
 from src.main import app
 from src.models.user import User
 from src.models.vendor import SQLModel
@@ -74,28 +74,46 @@ async def client(db_session: AsyncSession) -> AsyncGenerator[AsyncClient, None]:
     Overrides BOTH the database session AND the authentication.
     """
 
-    # 1. Override the Database Session (Connect to Test DB)
+    # Override the Database Session (Connect to Test DB)
     def override_get_db_session() -> AsyncSession:
         return db_session
 
     app.dependency_overrides[get_db_session] = override_get_db_session
 
-    # 2. Override the Authentication (Bypass Login)
-    # This creates a "Fake" logged-in user so tests don't need a token
-    mock_user = User(
-        id=UUID("00000000-0000-0000-0000-000000000000"),
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as async_client:
+        yield async_client
+
+    # Clean up overrides after the test
+    app.dependency_overrides.clear()
+
+
+@pytest_asyncio.fixture(scope="function")
+async def authorized_client(
+    client: AsyncClient, db_session: AsyncSession
+) -> AsyncClient:
+    """
+    Creates a valid user in the test DB and attaches a real JWT token
+    to the client headers for testing protected routes.
+    """
+    user_id = UUID("00000000-0000-0000-0000-000000000000")
+
+    # 1. Put the test user in the test database
+    test_user = User(
+        id=user_id,
         email="test@example.com",
         username="testuser",
         hashed_password="fake",
         name="Test User",
         is_active=True,
     )
-    app.dependency_overrides[get_current_user] = lambda: mock_user
+    db_session.add(test_user)
+    await db_session.flush()  # Make it available to the session
 
-    # 3. Create the Client
-    transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as async_client:
-        yield async_client
+    # 2. Generate a real token
+    access_token = create_access_token(data={"sub": str(user_id)})
 
-    # 4. Clean up overrides after the test
-    app.dependency_overrides.clear()
+    # 3. Attach it to the client headers
+    client.headers["Authorization"] = f"Bearer {access_token}"
+
+    return client
