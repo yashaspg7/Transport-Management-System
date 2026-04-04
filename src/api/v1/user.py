@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from fastapi import APIRouter, HTTPException, status
 
 from src.api.deps import DBSession, UserServiceDep
@@ -44,6 +46,15 @@ async def register_user(
             status_code=status.HTTP_409_CONFLICT,
             detail="A user with this username already exists.",
         )
+
+
+@router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_user(
+    user_id: UUID,
+    session: DBSession,
+    service: UserServiceDep,
+) -> None:
+    await service.delete_user(session, user_id=user_id)
 
 
 # add POST /login here
