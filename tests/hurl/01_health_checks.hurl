@@ -18,6 +18,7 @@ Accept: application/json
 HTTP 201
 [Captures]
 test_username: jsonpath "$.username"
+test_user_id: jsonpath "$.id"
 
 POST http://127.0.0.1:8000/api/v1/auth/login
 [FormParams]
@@ -346,6 +347,15 @@ jsonpath "$.status" == "healthy"
 jsonpath "$.service" == "Transport-Management-System"
 jsonpath "$.version" == "0.1.0"
 duration < 1000
+
+# ==============================================================================
+# TEARDOWN: Clean up the test user
+# ==============================================================================
+
+DELETE http://127.0.0.1:8000/api/v1/users/{{test_user_id}}
+Authorization: Bearer {{access_token}}
+
+HTTP 204
 
 # ==============================================================================
 # Health Check Summary
