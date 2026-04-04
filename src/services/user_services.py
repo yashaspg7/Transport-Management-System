@@ -2,7 +2,7 @@ from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.core.security import hash_password
+from src.core.security import hash_password, verify_password
 from src.models.user import User
 from src.repositories.user import UserRepository
 from src.schemas.user import UserCreate, UserUpdate
@@ -65,3 +65,11 @@ class UserService:
         if not db_user:
             raise UserNotFound(f"User with id {user_id} was not found.")
         await self.repo.delete(session, db_obj=db_user)
+
+    async def authenticate_user(
+        self, session: AsyncSession, username: str, password: str
+    ) -> User | None:
+        user = await self.repo.get_by_username(session, username=username)
+        if not user or not verify_password(password, user.hashed_password):
+            return None
+        return user
