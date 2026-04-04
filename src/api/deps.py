@@ -17,16 +17,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.core.config import settings
 from src.core.db import get_db_session
 from src.models.user import User
-from src.repositories.user import UserRepository
-from src.repositories.vendor import VendorRepository
+from src.repositories.user import user_repo
+from src.repositories.vendor import vendor_repo
 from src.services.user_services import UserService
 from src.services.vendor_service import VendorService
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
-
-# Create a single, reusable instance of the repository
-vendor_repo = VendorRepository()
-user_repo = UserRepository()
 
 
 def get_vendor_service() -> VendorService:
@@ -82,6 +78,9 @@ async def get_current_user(
     user = await user_repo.get_by_id(session, user_uuid)
     if user is None:
         raise credentials_exception
+
+    if not user.is_active:
+        raise HTTPException(status_code=400, detail="Inactive user")
 
     return user
 
