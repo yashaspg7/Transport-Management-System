@@ -3,6 +3,7 @@ from uuid import UUID
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlmodel import col
 
 from src.models.user import User
 from src.schemas.user import UserUpdate
@@ -15,11 +16,13 @@ class UserRepository:
     async def get_by_username(
         self, session: AsyncSession, username: str
     ) -> Optional[User]:
-        result = await session.execute(select(User).where(User.username == username))  # type: ignore[arg-type]
+        result = await session.execute(
+            select(User).where(col(User.username) == username)
+        )
         return result.scalar_one_or_none()
 
     async def get_by_email(self, session: AsyncSession, email: str) -> Optional[User]:
-        result = await session.execute(select(User).where(User.email == email))  # type: ignore[arg-type]
+        result = await session.execute(select(User).where(col(User.email) == email))
         return result.scalar_one_or_none()
 
     async def get_all(
