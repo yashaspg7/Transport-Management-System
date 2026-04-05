@@ -9,19 +9,19 @@ from src.utils.sanitizers import SanitizationMixin
 
 
 class UserBase(BaseModel, SanitizationMixin):
-    name: str = Field()
-    username: str = Field()
-    email: EmailStr = Field()
+    name: str = Field(min_length=1, max_length=100)
+    username: str = Field(min_length=1, max_length=100)
+    email: EmailStr = Field(max_length=254)
 
 
 class UserCreate(UserBase):
-    password: str
+    password: str = Field(min_length=8, max_length=50)
 
 
 class UserUpdate(BaseModel, SanitizationMixin):
-    name: Optional[str] = Field()
-    username: Optional[str] = Field()
-    email: Optional[EmailStr] = Field()
+    name: Optional[str] = Field(min_length=1, max_length=100)
+    username: Optional[str] = Field(min_length=1, max_length=100)
+    email: Optional[EmailStr] = Field(min_length=1, max_length=100)
 
 
 class UserRead(UserBase):
